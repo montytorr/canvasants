@@ -1,0 +1,8 @@
+.ant-farm-canvas {
+    height: 600px;
+    width: 800px;
+    margin: auto;
+    display: block;
+
+    border: 1px solid #ccc;
+}
