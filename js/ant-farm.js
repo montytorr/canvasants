@@ -10,6 +10,7 @@ AntApp.AntFarm = function(options) {
     var worldWidth = null;
     var totalAnts = null;
     var pheromoneMatrix = false;
+    var piecesOfFood = null;
 
     var init = function(options) {
 
@@ -21,6 +22,7 @@ AntApp.AntFarm = function(options) {
         createPheromoneMatrix();
         createNestView();
         createAnts();
+        createFood();
         paperLib.view.draw();
     };
 
@@ -70,6 +72,21 @@ AntApp.AntFarm = function(options) {
             );
         }
 
+    };
+
+    var createFood = function() {
+
+        piecesOfFood = piecesOfFood || [];
+
+        piecesOfFood.push(new AntApp.Food({
+            x: 50,
+            y: 50,
+            totalFood: 5000,
+            width: 50,
+            height: 20,
+            paperLib: paperLib,
+            antFarm: instance
+        }));
     };
 
     var getFarmLimits = function() {
