@@ -2,7 +2,7 @@ var AntApp = AntApp || {};
 
 AntApp.Ant = function(options) {
 
-    this.init(options);
+    this._init(options);
 };
 
 AntApp.Ant.prototype = {
@@ -22,7 +22,7 @@ AntApp.Ant.prototype = {
     rotation: null,
     prevRotation: null,
 
-    init: function(options) {
+    _init: function(options) {
 
         this.id = options.id;
         this.x = options.initialX;
@@ -33,10 +33,10 @@ AntApp.Ant.prototype = {
         this.antFarm = options.antFarm;
         this.food = 0;
 
-        this.initView();
+        this._initView();
     },
 
-    initView: function() {
+    _initView: function() {
 
         var initPosition = new this.paperLib.Point(0, 0);
         this.antShape = new this.paperLib.Path(initPosition, 1);
@@ -47,10 +47,10 @@ AntApp.Ant.prototype = {
             strokeWidth: this.STROKE_WIDTH
         };
 
-        this.position();
+        this._position();
     },
 
-    position: function() {
+    _position: function() {
 
         var newLocation = new this.paperLib.Point(this.x, this.y);
         this.antShape.position = newLocation;
@@ -59,29 +59,29 @@ AntApp.Ant.prototype = {
         this.prevRotation = this.rotation;
     },
 
-    updatePosition: function(event) {
+    update: function(event) {
 
         var deltaRotation = ((2*Math.random()*this.MAX_ROTATION ) - this.MAX_ROTATION )* (event.delta);
-        this.addToRotation(deltaRotation);
+        this._addToRotation(deltaRotation);
 
         this.x += Math.sin(this.rotation) * (this.MAX_SPEED*event.delta);
         this.y += -Math.cos(this.rotation) * (this.MAX_SPEED*event.delta);
 
         var limits = this.antFarm.getFarmLimits();
-        if(this.isOutOfLimits(limits)){
+        if(this._isOutOfLimits(limits)){
 
-            this.setInsideLimits(limits);
+            this._setInsideLimits(limits);
         }
 
-        this.position();
+        this._position();
     },
 
-    isOutOfLimits: function(limits) {
+    _isOutOfLimits: function(limits) {
 
         return (this.x <0) || (this.y<0) || (this.x>limits.width) || (this.y>limits.height);
     },
 
-    setInsideLimits: function(limits) {
+    _setInsideLimits: function(limits) {
 
         //Circular world!!
         if(this.x <0) {
@@ -102,7 +102,7 @@ AntApp.Ant.prototype = {
         }
     },
 
-    addToRotation: function(deltaRotation) {
+    _addToRotation: function(deltaRotation) {
 
         this.rotation += deltaRotation;
         if(this.rotation <0) {

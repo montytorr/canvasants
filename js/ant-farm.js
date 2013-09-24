@@ -101,7 +101,7 @@ AntApp.AntFarm = function(options) {
 
         _.each(ants, function(ant) {
 
-            ant.updatePosition(event);
+            ant.update(event);
         });
 
         pheromoneMatrix.update(event, ants);
