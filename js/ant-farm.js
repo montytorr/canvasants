@@ -2,9 +2,10 @@ var AntApp = AntApp || {};
 
 AntApp.AntFarm = function(options) {
 
-    var PHEROMONE_ANT_SECOND = 3;
-    var PHEROMONE_DECAY_SECOND = 0.05;
-    var PHEROMONE_MAX = 5;
+    var PHEROMONE_ANT_SECOND = 1;
+    var PHEROMONE_DECAY_SECOND = 0.01;
+    var PHEROMONE_MAX = 2;
+    var NEST_SIZE = 30; //pixels, side of square
 
     var ants = [];
     var paperLib = null;
@@ -23,6 +24,7 @@ AntApp.AntFarm = function(options) {
         totalAnts = options.ants;
 
         createPheromoneView();
+        createNestView();
         createAnts();
         paperLib.view.draw();
     };
@@ -37,7 +39,17 @@ AntApp.AntFarm = function(options) {
         pheromoneViewData = pheromoneView.getImageData(emptyRectangle);
     };
 
+    var createNestView = function() {
+
+        var nestStaringPoint = new paperLib.Point((worldWidth/2), (worldHeight/2));
+        var nestShape = new paperLib.Path.Circle(nestStaringPoint, NEST_SIZE/2);
+        nestShape.style = {
+            fillColor: "#aaa"
+        };
+    };
+
     var setPixel = function (imageData, x, y, r, g, b, a) {
+
         index = (x + y * imageData.width) * 4;
         imageData.data[index+0] = r;
         imageData.data[index+1] = g;
@@ -50,18 +62,27 @@ AntApp.AntFarm = function(options) {
         var randomX, randomY;
         for(var i=0; i<totalAnts; i++) {
 
-            randomX = Math.floor(Math.random()*worldWidth);
-            randomY = Math.floor(Math.random()*worldHeight);
+            randomX = Math.floor(Math.random()*NEST_SIZE*2) + (worldWidth/2) - (NEST_SIZE);
+            randomY = Math.floor(Math.random()*NEST_SIZE*2) + (worldHeight/2) - (NEST_SIZE);
 
             ants.push( new AntApp.Ant({
                     id:       i,
                     initialX: randomX,
                     initialY: randomY,
-                    paperLib: paperLib
+                    paperLib: paperLib,
+                    antFarm: instance
                 })
             );
         }
 
+    };
+
+    var getFarmLimits = function() {
+
+        return {
+            width: worldWidth,
+            height: worldHeight
+        };
     };
 
     var updateFarm = function(event) {
@@ -128,10 +149,14 @@ AntApp.AntFarm = function(options) {
         pheromoneView.setImageData(pheromoneViewData);
     };
 
+    var instance = {
+
+        updateFarm:     updateFarm,
+        getFarmLimits:  getFarmLimits
+    };
+
     init(options);
 
-    return {
 
-        updateFarm:     updateFarm
-    };
+    return instance;
 };
