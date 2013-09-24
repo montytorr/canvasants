@@ -31,6 +31,7 @@ AntApp.Ant.prototype = {
         this.rotation = 2*Math.random()*Math.PI;
         this.paperLib = options.paperLib;
         this.antFarm = options.antFarm;
+        this.food = 0;
 
         this.initView();
     },
@@ -111,5 +112,10 @@ AntApp.Ant.prototype = {
 
             this.rotation -= 2*Math.PI;
         }
+    },
+
+    hasFood: function() {
+
+        return !!this.food;
     }
 };

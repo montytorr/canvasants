@@ -2,9 +2,6 @@ var AntApp = AntApp || {};
 
 AntApp.AntFarm = function(options) {
 
-    var PHEROMONE_ANT_SECOND = 1;
-    var PHEROMONE_DECAY_SECOND = 0.01;
-    var PHEROMONE_MAX = 2;
     var NEST_SIZE = 30; //pixels, side of square
 
     var ants = [];
@@ -12,9 +9,7 @@ AntApp.AntFarm = function(options) {
     var worldHeight = null;
     var worldWidth = null;
     var totalAnts = null;
-    var pheromoneMatrix = [];
-    var pheromoneView = null;
-    var pheromoneViewData = null;
+    var pheromoneMatrix = false;
 
     var init = function(options) {
 
@@ -23,20 +18,20 @@ AntApp.AntFarm = function(options) {
         worldWidth = options.canvas.clientWidth;
         totalAnts = options.ants;
 
-        createPheromoneView();
+        createPheromoneMatrix();
         createNestView();
         createAnts();
         paperLib.view.draw();
     };
 
-    var createPheromoneView = function() {
+    var createPheromoneMatrix = function() {
 
-        var emptyRectangle = new paperLib.Path.Rectangle(0,0,worldWidth,worldHeight);
-        emptyRectangle.style = {
-            fillColor: 'white'
-        };
-        pheromoneView = emptyRectangle.rasterize();
-        pheromoneViewData = pheromoneView.getImageData(emptyRectangle);
+        pheromoneMatrix = new AntApp.PheromoneMatrix({
+
+            paperLib:       paperLib,
+            worldWidth:     worldWidth,
+            worldHeight:    worldHeight
+        });
     };
 
     var createNestView = function() {
@@ -92,61 +87,7 @@ AntApp.AntFarm = function(options) {
             ant.updatePosition(event);
         });
 
-        updatePheromoneMatrix(event);
-
-        updatePheromoneView();
-    };
-
-    var updatePheromoneMatrix = function(event) {
-
-        _.each(ants, function(ant) {
-
-            var x = Math.round(ant.x);
-            var y = Math.round(ant.y);
-            pheromoneMatrix[x] = pheromoneMatrix[x] || [];
-            pheromoneMatrix[x][y] = pheromoneMatrix[x][y] || 0;
-            pheromoneMatrix[x][y] += event.delta*PHEROMONE_ANT_SECOND;
-        });
-
-        var decayToApply = event.delta*PHEROMONE_DECAY_SECOND;
-        for(var i=0; i<worldWidth; i++) {
-
-            if(pheromoneMatrix[i]) {
-
-                for(var j=0; j<worldHeight; j++) {
-
-                    if(pheromoneMatrix[i][j]) {
-
-                        pheromoneMatrix[i][j] -= decayToApply;
-                        if(pheromoneMatrix[i][j] < 0) {
-                            pheromoneMatrix[i][j] = 0;
-                        } else if (pheromoneMatrix[i][j] > PHEROMONE_MAX) {
-                            pheromoneMatrix[i][j] = PHEROMONE_MAX;
-                        }
-                    }
-                }
-            }
-        }
-    };
-
-    var updatePheromoneView = function() {
-
-        for(var i=0; i<worldWidth; i++) {
-
-            if(pheromoneMatrix[i]) {
-
-                for(var j=0; j<worldHeight; j++) {
-
-                    if(pheromoneMatrix[i][j]) {
-
-                        var alpha = Math.round((pheromoneMatrix[i][j] / PHEROMONE_MAX)*256) | 0;
-                        setPixel(pheromoneViewData, i, j, 255 , 0, 0, alpha); //255
-                    }
-                }
-            }
-        }
-
-        pheromoneView.setImageData(pheromoneViewData);
+        pheromoneMatrix.update(event, ants);
     };
 
     var instance = {
