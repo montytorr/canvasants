@@ -1,3 +1,15 @@
+/*
+Not carrying food, not on pheromone trail -> walk randomly lay pheromone
+Not carrying food on pheromone trail -> follow pheromone trail lay more pheromone
+Reach home without food on pheromone trail -> turn around follow trail in opposite direction
+Reach food -> pick up food turn around follow trail in opposite direction
+Carrying food -> follow trail lay more pheromone
+Reach home with food -> deposit food turn around follow trail in opposite direction
+
+http://mute-net.sourceforge.net/howAnts.shtml
+
+ */
+
 var AntApp = AntApp || {};
 
 AntApp.Ant = function(options) {
@@ -74,6 +86,14 @@ AntApp.Ant.prototype = {
         }
 
         this._position();
+
+        //If it has food and it's in the nest, drop it
+        if(this.hasFood() && this.isInNest() ) {
+
+            this.dropFood();
+        }
+
+        //If it finds food: turn around
     },
 
     _isOutOfLimits: function(limits) {
